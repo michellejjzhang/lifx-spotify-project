@@ -1,0 +1,15 @@
+extends layout
+
+block currently-playing
+    script(src='/javascripts/clientSide.js')
+    div.container
+        h1 Currently Listening To:
+        h2= data['songName']
+        h3 Song Analysis
+            ul#songInfo.dl-horizontal
+                if data['songAnalysis']
+                    for val, index in data['songAnalysis']
+                        li= index + ': ' + val
+                else
+                    li= ''
+
