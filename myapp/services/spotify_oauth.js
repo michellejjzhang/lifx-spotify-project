@@ -3,9 +3,9 @@ var request = require('request'); // "Request" library
 var analysis = require('./spotify_analysis');
 var cookie = require('cookie');
 
-var client_id = '';
-var client_secret = '';
-var redirect_uri = 'http://localhost:8888/spotify/callback'; 
+var client_id = ''; // Your client id
+var client_secret = ''; // Your secret
+var redirect_uri = 'http://localhost:8888/spotify/callback';
 var stateKey = 'spotify_auth_state';
 
 var oauthorization = {
@@ -61,7 +61,7 @@ var oauthorization = {
             request.post(authOptions, function(error, response, body) {
                 if (!error && response.statusCode === 200) {
                     oauthorization.setCookies(res, body);
-                    res.redirect('.././currently-playing');
+                    res.redirect('.././currently-playing/');
                 } else {
                     console.log("error");
                     console.log(error);
@@ -72,8 +72,7 @@ var oauthorization = {
     },
     getNewToken: function(req, res) {
         // requesting access token from refresh token
-        res.clearCookie('access_token');
-        var refresh_token = req.query.refresh_token;
+        var refresh_token = req.cookies ? req.cookies['refresh_token'] : null;
         var authOptions = {
             url: 'https://accounts.spotify.com/api/token',
             headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },
@@ -86,11 +85,8 @@ var oauthorization = {
 
         request.post(authOptions, function(error, response, body) {
             if (!error && response.statusCode === 200) {
-                var access_token = body.access_token;
                 oauthorization.setCookies(res, body);
-                res.send({
-                    'access_token': access_token
-                });
+                res.redirect('.././currently-playing/');
             }
         });
     },
