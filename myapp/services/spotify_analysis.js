@@ -4,6 +4,7 @@ var control = require('./lifx');
 
 var analysis = {
     previousTrackId: "",
+    previousColor: "",
     displayInfo: {},
     findTrackName: function(access_token){
         if (access_token){
@@ -17,7 +18,9 @@ var analysis = {
                 if(!body['error'] && body['item'] != null){
                     analysis.setNewColor(body, access_token);
                     var songName = body['item']['name'];
+                    var currentlyPlayingImage = body['item']['album']['images'][1]['url'];
                     analysis.displayInfo['songName'] = songName;
+                    analysis.displayInfo['currentlyPlayingImage'] = currentlyPlayingImage;
                 }
             });
         }
@@ -37,7 +40,10 @@ var analysis = {
                 if (!body['error']){
                     requestOptions += 'rgb:'+analysis.analyzeColorOfTrack(body);
                     requestOptions += ' saturation:'+analysis.analyzeSaturationOfTrack(body);
-                    control.setColor(requestOptions);
+                    if (requestOptions != analysis.previousColor){
+                        control.setColor(requestOptions);
+                        analysis.previousColor = requestOptions;
+                    }
                     analysis.displayInfo['songAnalysis']= body;
                 } else {
                     console.log("error1");

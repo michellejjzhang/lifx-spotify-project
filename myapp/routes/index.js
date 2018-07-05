@@ -2,15 +2,13 @@ var express = require('express');
 var router = express.Router();
 
 var request = require('request'); // "Request" library
-var spotify_router = require('./spotify');
-var analysis = require('../services/spotify_analysis');
 
-/* GET home page. */
-router.get('/', function(req, res) {
+router.get('/', function(req, res, next) {
     var loggedIn = false;
     var access_token = req.cookies ? req.cookies['access_token'] : null;
-    console.log(req.cookies);
-    if (access_token){
+    var refresh_token = req.cookies ? req.cookies['refresh_token'] : null;
+
+    if (access_token && refresh_token != 'undefined'){
         var authOptions = {
             url: 'https://api.spotify.com/v1/me',
             headers: {
@@ -18,30 +16,19 @@ router.get('/', function(req, res) {
             },
             json: true
         };
-        request.get(authOptions, function(error, response) {
-            console.log(response.statusCode);
-            if (!error && response.statusCode === 200) {
-                console.log("reaching here");
+        request.get(authOptions, function(error, response, body) {
+            if (!body['error'] && response.statusCode === 200) {
                 loggedIn = true;
             }
             if (!loggedIn){
-                res.redirect('/spotify/');
+                res.redirect('/spotify/refresh');
             } else {
-                res.redirect('/currently-playing/')
+                res.redirect('/currently-playing/');
             }
         });
     } else {
         res.redirect('/spotify/');
     }
-});
-
-router.use('/spotify', spotify_router);
-
-router.get('/currently-playing', function(req, res){
-    var access_token = req.cookies ? req.cookies['access_token'] : null;
-    analysis.findTrackName(access_token);
-    var data = analysis.returnDisplayData();
-    res.render('currently_playing', {data : data});
 });
 
 module.exports = router;
