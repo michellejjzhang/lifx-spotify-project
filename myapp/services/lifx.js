@@ -11,7 +11,7 @@ var control = {
             power: 'on',
             color: color,
             duration: 1.5
-        }, function(err, data) {
+        }, function(err) {
             if(err) {
                 console.error(err);
                 return;
