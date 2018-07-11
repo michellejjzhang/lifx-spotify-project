@@ -82,26 +82,31 @@ var oauthorization = {
             },
             json: true
         };
+        console.log(refresh_token);
 
         request.post(authOptions, function(error, response, body) {
+            console.log(error);
+            console.log(body);
             if (!error && response.statusCode === 200) {
                 oauthorization.setCookies(res, body);
+                console.log(body);
                 res.redirect('.././currently-playing/');
+            } else {
+                res.redirect('/spotify/login');
             }
         });
     },
     setCookies: function(res, body){
         var set_cookies = [];
-        set_cookies.push(oauthorization.serializeCookie('access_token', body.access_token));
-        set_cookies.push(oauthorization.serializeCookie('refresh_token', body.refresh_token));
+        set_cookies.push(oauthorization.serializeCookie('access_token', body.access_token, 1.5, {"path":"/"}));
+        set_cookies.push(oauthorization.serializeCookie('refresh_token', body.refresh_token, 10, {"path":"/spotify"}));
         res.header("Set-Cookie", set_cookies);
     },
-    serializeCookie: function(key, value) {
+    serializeCookie: function(key, value, hrs, path) {
         // This is res.cookie’s code without the array management and also ignores signed cookies.
         if ('number' == typeof value) value = val.toString();
         if ('object' == typeof value) value = JSON.stringify(val);
-        var path = {"path":"/"};
-        return cookie.serialize(key, value, path);
+        return cookie.serialize(key, value, path, {maxAge: (1000 * 60 * 60 * hrs), httpOnly:true});
     }
 };
 
