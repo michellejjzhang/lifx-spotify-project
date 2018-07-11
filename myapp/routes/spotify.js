@@ -6,13 +6,12 @@ var analysis = require('../services/spotify_analysis');
 
 spotify_router.get('/', function(req, res){
     var refresh_token = req.cookies ? req.cookies['refresh_token'] : null;
-    console.log(refresh_token);
+
     if(refresh_token && refresh_token != 'undefined'){
         res.redirect('/spotify/refresh');
     } else {
-        res.render('./../views/login');
+        res.render('.././views/login')
     }
-
 });
 
 spotify_router.get('/login', oauthorization.login);

@@ -3,7 +3,7 @@ var router = express.Router();
 
 var request = require('request'); // "Request" library
 
-router.get('/', function(req, res, next) {
+router.get('/', function(req, res) {
     var loggedIn = false;
     var access_token = req.cookies ? req.cookies['access_token'] : null;
     var refresh_token = req.cookies ? req.cookies['refresh_token'] : null;
@@ -17,7 +17,7 @@ router.get('/', function(req, res, next) {
             json: true
         };
         request.get(authOptions, function(error, response, body) {
-            if (!body['error'] && response.statusCode === 200) {
+            if (body && !body['error'] && response.statusCode === 200) {
                 loggedIn = true;
             }
             if (!loggedIn){
